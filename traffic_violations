@@ -1,0 +1,56 @@
+#import statements 
+
+import plotly.graph_objs as go 
+from plotly.offline import init_notebook_mode,iplot
+init_notebook_mode(connected=True)
+import plotly as py
+import plotly.graph_objs as go
+import ipywidgets as widgets
+import numpy as np
+from scipy import special
+import plotly.tools as tls
+import pandas as pd
+import os
+
+#getting traffic violations data from csv file
+
+default_file = "Traffic_Violations.csv"
+data = pd.read_csv(default_file)
+
+#using offline mode
+
+py.offline.init_notebook_mode(connected=True)
+
+#getting the number of violations from a particular state
+
+df = data.groupby(['State'])[['State']].agg('count')
+
+# defining a colorscale
+
+colorscale_1 =  [
+        [0, 'rgb(250, 250, 250)'],        #0
+        [1./10000, 'rgb(200, 200, 200)'], #10
+        [1./1000, 'rgb(150, 150, 150)'],  #100
+        [1./100, 'rgb(100, 100, 100)'],   #1000
+        [1./10, 'rgb(50, 50, 50)'],       #10000
+        [1., 'rgb(0, 0, 0)'],             #100000
+
+    ]
+
+#defining data for plotting
+data2 = dict(type = 'choropleth', 
+             locations = df.index,
+             locationmode = 'USA-states', 
+             z = df['State'],
+             colorbar = {'title': 'Number of Traffic Violations'},
+             colorscale = colorscale_1,
+             text = df['State'] )
+
+layout2 = dict(title = 'Traffic Violations', 
+               #projection=dict( type='albers usa' ),
+               geo = dict(scope= 'usa'))
+               
+#mapping 
+
+choromap2 = go.Figure(data = [data2],layout = layout2)
+iplot(choromap2)
